@@ -94,6 +94,7 @@ struct ext4_inode_ref {
 	bool dirty;
 };
 
+struct ext4_fs *ext4_mountpoint_fs(const char *mountpoint);
 
 /**@brief Convert block address to relative index in block group.
  * @param s Superblock pointer
@@ -266,6 +267,9 @@ int ext4_fs_init_inode_dblk_idx(struct ext4_inode_ref *inode_ref,
  */
 int ext4_fs_append_inode_dblk(struct ext4_inode_ref *inode_ref,
 			      ext4_fsblk_t *fblock, ext4_lblk_t *iblock);
+
+int ext4_fs_insert_inode_dblk(struct ext4_inode_ref *inode_ref,
+			      ext4_fsblk_t *fblock, ext4_lblk_t iblock);
 
 /**@brief   Increment inode link count.
  * @param   inode_ref none handle

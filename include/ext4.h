@@ -151,6 +151,9 @@ int ext4_mount(const char *dev_name,
  * @return  Standard error code */
 int ext4_umount(const char *mount_point);
 
+struct ext4_mountpoint;
+struct ext4_mountpoint *ext4_get_mount(const char *path);
+
 /**@brief   Starts journaling. Journaling start/stop functions are transparent
  *          and might be used on filesystems without journaling support.
  * @warning Usage:

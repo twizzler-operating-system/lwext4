@@ -96,6 +96,7 @@ struct ext4_mountpoint {
 	struct ext4_bcache bc;
 };
 
+
 /**@brief   Block devices descriptor.*/
 struct ext4_block_devices {
 
@@ -472,7 +473,7 @@ Finish:
 	return r;
 }
 
-static struct ext4_mountpoint *ext4_get_mount(const char *path)
+struct ext4_mountpoint *ext4_get_mount(const char *path)
 {
 	for (size_t i = 0; i < CONFIG_EXT4_MOUNTPOINTS_COUNT; ++i) {
 
@@ -484,6 +485,17 @@ static struct ext4_mountpoint *ext4_get_mount(const char *path)
 	}
 
 	return NULL;
+}
+
+struct ext4_fs *ext4_mountpoint_fs(const char *mountpoint) {
+    struct ext4_mountpoint *mp;
+
+    mp = ext4_get_mount(mountpoint);
+    if (mp == NULL) {
+        return NULL;
+    }
+
+    return &mp->fs;
 }
 
 __unused

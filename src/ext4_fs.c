@@ -1711,6 +1711,81 @@ int ext4_fs_append_inode_dblk(struct ext4_inode_ref *inode_ref,
 	return EOK;
 }
 
+int ext4_fs_insert_inode_dblk(struct ext4_inode_ref *inode_ref,
+			      ext4_fsblk_t *fblock, ext4_lblk_t iblock)
+{
+    int rc1 = ext4_fs_init_inode_dblk_idx(inode_ref, iblock, fblock);
+    if (rc1 == EOK && *fblock != 0) {
+        return EOK;
+    }
+#if CONFIG_EXTENT_ENABLE && CONFIG_EXTENTS_ENABLE
+	/* Handle extents separately */
+	if ((ext4_sb_feature_incom(&inode_ref->fs->sb, EXT4_FINCOM_EXTENTS)) &&
+	    (ext4_inode_has_flag(inode_ref->inode, EXT4_INODE_FLAG_EXTENTS))) {
+		int rc;
+		ext4_fsblk_t current_fsblk;
+		struct ext4_sblock *sb = &inode_ref->fs->sb;
+		uint64_t inode_size = ext4_inode_get_size(sb, inode_ref->inode);
+		uint32_t block_size = ext4_sb_get_block_size(sb);
+
+		rc = ext4_extent_get_blocks(inode_ref, iblock, 1,
+						&current_fsblk, true, NULL);
+		if (rc != EOK)
+			return rc;
+
+		*fblock = current_fsblk;
+		ext4_assert(*fblock);
+
+		if (inode_size < iblock * block_size) {
+    		ext4_inode_set_size(inode_ref->inode, iblock * block_size);
+    		inode_ref->dirty = true;
+		}
+
+		return rc;
+	}
+#endif
+	struct ext4_sblock *sb = &inode_ref->fs->sb;
+
+	/* Compute next block index and allocate data block */
+	uint64_t inode_size = ext4_inode_get_size(sb, inode_ref->inode);
+	uint32_t block_size = ext4_sb_get_block_size(sb);
+
+	/* Align size i-node size */
+	//if ((inode_size % block_size) != 0)
+	//	inode_size += block_size - (inode_size % block_size);
+
+	/* Logical blocks are numbered from 0 */
+	uint32_t new_block_idx = iblock;
+
+	/* Allocate new physical block */
+	ext4_fsblk_t goal, phys_block;
+	int rc = ext4_fs_indirect_find_goal(inode_ref, &goal);
+	if (rc != EOK)
+		return rc;
+
+	rc = ext4_balloc_alloc_block(inode_ref, goal, &phys_block);
+	if (rc != EOK)
+		return rc;
+
+	/* Add physical block address to the i-node */
+	rc = ext4_fs_set_inode_data_block_index(inode_ref, new_block_idx,
+						phys_block);
+	if (rc != EOK) {
+		ext4_balloc_free_block(inode_ref, phys_block);
+		return rc;
+	}
+
+	/* Update i-node */
+	if (inode_size < iblock * block_size) {
+    	ext4_inode_set_size(inode_ref->inode, iblock * block_size);
+    	inode_ref->dirty = true;
+	}
+
+	*fblock = phys_block;
+
+	return EOK;
+}
+
 void ext4_fs_inode_links_count_inc(struct ext4_inode_ref *inode_ref)
 {
 	uint16_t link;
