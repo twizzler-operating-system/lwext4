@@ -1,10 +1,6 @@
 project(lwext4 C)
 cmake_minimum_required(VERSION 3.4)
 
-add_link_options("-Wl,--gc-sections")
-add_link_options("-Wl,--version-script=${PROJECT_SOURCE_DIR}/version_script")
-add_link_options("-nodefaultlibs")
-
 include_directories(include)
 include_directories(${PROJECT_BINARY_DIR}/include)
 
