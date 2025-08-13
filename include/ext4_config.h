@@ -42,7 +42,13 @@ extern "C" {
 #endif
 
 #if !CONFIG_USE_DEFAULT_CFG
+#if defined __has_include
+#  if __has_include ("generated/ext4_config.h")
 #include "generated/ext4_config.h"
+#  endif
+#else
+#include "generated/ext4_config.h"
+#endif
 #endif
 
 /*****************************************************************************/
@@ -125,7 +131,7 @@ extern "C" {
 
 /**@brief   Cache size of block device.*/
 #ifndef CONFIG_BLOCK_DEV_CACHE_SIZE
-#define CONFIG_BLOCK_DEV_CACHE_SIZE 8
+#define CONFIG_BLOCK_DEV_CACHE_SIZE 32
 #endif
 
 
