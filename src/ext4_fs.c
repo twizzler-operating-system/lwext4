@@ -1716,6 +1716,13 @@ int ext4_fs_insert_inode_dblk(struct ext4_inode_ref *inode_ref,
 {
     int rc1 = ext4_fs_init_inode_dblk_idx(inode_ref, iblock, fblock);
     if (rc1 == EOK && *fblock != 0) {
+        struct ext4_sblock *sb = &inode_ref->fs->sb;
+        uint64_t inode_size = ext4_inode_get_size(sb, inode_ref->inode);
+		uint32_t block_size = ext4_sb_get_block_size(sb);
+        if (inode_size < iblock * block_size) {
+          		ext4_inode_set_size(inode_ref->inode, iblock * block_size);
+          		inode_ref->dirty = true;
+		}
         return EOK;
     }
 #if CONFIG_EXTENT_ENABLE && CONFIG_EXTENTS_ENABLE
