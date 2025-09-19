@@ -91,6 +91,15 @@ void ext4_bcache_cleanup(struct ext4_bcache *bc)
 	}
 }
 
+void ext4_bcache_flush(struct ext4_bcache *bc)
+{
+	struct ext4_buf *buf, *tmp;
+	RB_FOREACH_SAFE(buf, ext4_buf_lba, &bc->lba_root, tmp) {
+    	if (ext4_bcache_test_flag(buf, BC_DIRTY))
+    		ext4_block_flush_buf(bc->bdev, buf);
+	}
+}
+
 int ext4_bcache_fini_dynamic(struct ext4_bcache *bc)
 {
 	memset(bc, 0, sizeof(struct ext4_bcache));

@@ -101,7 +101,7 @@ int ext4_bmap_bit_find_clr(uint8_t *bmap, uint32_t sbit, uint32_t ebit,
 			return ENOSPC;
 
 		if (ext4_bmap_is_bit_clr(bmap, i)) {
-			*bit_id = sbit;
+			*bit_id = i;
 			return EOK;
 		}
 

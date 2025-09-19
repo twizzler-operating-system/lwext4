@@ -1927,7 +1927,7 @@ int ext4_fwrite(ext4_file *file, const void *buf, size_t size, size_t *wcnt)
 	fblock_count = 0;
 	while (size >= block_size) {
 
-		while (iblk_idx < iblock_last) {
+		while (iblk_idx < iblock_last && fblock_count * block_size <= size) {
 			if (iblk_idx < ifile_blocks) {
 				r = ext4_fs_init_inode_dblk_idx(&ref, iblk_idx,
 								&fblk);

@@ -224,6 +224,8 @@ int ext4_bcache_init_dynamic(struct ext4_bcache *bc, uint32_t cnt,
  * @param   bc block cache descriptor.*/
 void ext4_bcache_cleanup(struct ext4_bcache *bc);
 
+void ext4_bcache_flush(struct ext4_bcache *bc);
+
 /**@brief   Dynamic de-initialization of block cache.
  * @param   bc block cache descriptor
  * @return  standard error code*/
