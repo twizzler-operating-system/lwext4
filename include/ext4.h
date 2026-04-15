@@ -288,6 +288,12 @@ int ext4_fremove(const char *path);
  * @return  Standard error code. */
 int ext4_flink(const char *path, const char *hardlink_path);
 
+struct ext4_mountpoint;
+struct ext4_inode_ref;
+int ext4_link(struct ext4_mountpoint *mp, struct ext4_inode_ref *parent,
+		     struct ext4_inode_ref *ch, const char *n,
+		     uint32_t len, bool rename);
+
 /**@brief Rename file.
  * @param path Source.
  * @param new_path Destination.
