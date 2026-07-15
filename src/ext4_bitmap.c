@@ -87,6 +87,20 @@ void ext4_bmap_bits_free(uint8_t *bmap, uint32_t sbit, uint32_t bcnt)
 	}
 }
 
+uint32_t ext4_bmap_count_empty_bits(uint8_t *bmap, uint32_t sbit, uint32_t ebit, uint32_t max_count)
+{
+	uint32_t i = sbit;
+	uint32_t empty_bits = 0;
+
+	while (i < ebit && empty_bits < max_count) {
+		if (ext4_bmap_is_bit_clr(bmap, i))
+			empty_bits++;
+		i++;
+	}
+
+	return empty_bits;
+}
+
 int ext4_bmap_bit_find_clr(uint8_t *bmap, uint32_t sbit, uint32_t ebit,
 			   uint32_t *bit_id)
 {

@@ -500,9 +500,7 @@ static ext4_fsblk_t ext4_new_meta_blocks(struct ext4_inode_ref *inode_ref,
 {
 	ext4_fsblk_t block = 0;
 
-	*errp = ext4_allocate_single_block(inode_ref, goal, &block);
-	if (count)
-		*count = 1;
+	*errp = ext4_balloc_alloc_multiple_blocks(inode_ref, goal, &block, count);
 	return block;
 }
 
@@ -2010,6 +2008,7 @@ __unused static void print_path(struct ext4_extent_path *path)
 	}
 }
 
+#include <stdio.h>
 int ext4_extent_get_blocks(struct ext4_inode_ref *inode_ref, ext4_lblk_t iblock,
 			   uint32_t max_blocks, ext4_fsblk_t *result,
 			   bool create, uint32_t *blocks_count)
@@ -2087,9 +2086,7 @@ int ext4_extent_get_blocks(struct ext4_inode_ref *inode_ref, ext4_lblk_t iblock,
 	 * requested block isn't allocated yet
 	 * we couldn't try to create block if create flag is zero
 	 */
-	if (!create) {
-		goto out2;
-	}
+
 
 	/* find next allocated block so that we know how many
 	 * blocks we can allocate without ovelapping next extent */
@@ -2097,6 +2094,11 @@ int ext4_extent_get_blocks(struct ext4_inode_ref *inode_ref, ext4_lblk_t iblock,
 	allocated = next - iblock;
 	if (allocated > max_blocks)
 		allocated = max_blocks;
+	if (!create) {
+		if(blocks_count)
+			*blocks_count = allocated;
+		goto out2;
+	}
 
 	/* allocate new block */
 	goal = ext4_ext_find_goal(inode_ref, path, iblock);

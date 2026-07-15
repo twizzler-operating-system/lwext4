@@ -109,6 +109,10 @@ int ext4_balloc_alloc_block(struct ext4_inode_ref *inode_ref,
 int ext4_balloc_try_alloc_block(struct ext4_inode_ref *inode_ref,
 				ext4_fsblk_t baddr, bool *free);
 
+int ext4_balloc_alloc_multiple_blocks(struct ext4_inode_ref *inode_ref,
+                        ext4_fsblk_t goal,
+                        ext4_fsblk_t *fblock, uint32_t *count);
+
 #ifdef __cplusplus
 }
 #endif

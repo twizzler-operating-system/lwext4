@@ -92,6 +92,9 @@ void ext4_bmap_bits_free(uint8_t *bmap, uint32_t sbit, uint32_t bcnt);
 int ext4_bmap_bit_find_clr(uint8_t *bmap, uint32_t sbit, uint32_t ebit,
 			   uint32_t *bit_id);
 
+uint32_t ext4_bmap_count_empty_bits(uint8_t *bmap, uint32_t sbit, uint32_t ebit,
+			    uint32_t max_count);
+
 #ifdef __cplusplus
 }
 #endif
