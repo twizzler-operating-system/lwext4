@@ -700,6 +700,9 @@ __ext4_balloc_alloc_multiple_block(struct ext4_inode_ref *inode_ref,
 			break;
 		}
 		thiscount = ext4_bmap_count_empty_bits(b.data, rel_blk_idx, blk_in_bg, *requested_count);
+		if(thiscount == *requested_count) {
+			break;
+		}
 		tmp = rel_blk_idx + thiscount + 1;
 	}
 	if (r == EOK && thiscount == *requested_count && tmp != blk_in_bg) {
@@ -781,6 +784,10 @@ goal_failed:
 				break;
 			}
 			thiscount = ext4_bmap_count_empty_bits(b.data, rel_blk_idx, blk_in_bg, *requested_count);
+
+			if(thiscount == *requested_count) {
+				break;
+			}
 			tmp = rel_blk_idx + thiscount + 1;
 		}
 		if (r == EOK && thiscount == *requested_count && tmp != blk_in_bg) {
@@ -862,6 +869,8 @@ int ext4_balloc_alloc_multiple_blocks(struct ext4_inode_ref *inode_ref,
                         ext4_fsblk_t goal,
                         ext4_fsblk_t *fblock, uint32_t *count)
 {
+	if (count == NULL || (count && (*count <= 1)))
+		return ext4_balloc_alloc_block(inode_ref, goal, fblock);
 	inode_ref->fs->block_alloc_lock();
 	int rc;
 	do {
